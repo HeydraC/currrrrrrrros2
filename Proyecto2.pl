@@ -29,3 +29,11 @@ map_all([V|Rest], AllCoords) :-
     append(VCoords, RestCoords, AllCoords).
 
 initialBoard(VList) :- map_all(VList, AllCoords), check(AllCoords).
+
+
+:-initialization(main).
+
+main :-
+  (initialBoard([v(0, h, 2, 0, 2), v(1, v, 0, 3, 3)]) -> write('Si'); write('No')),
+  
+  halt.
