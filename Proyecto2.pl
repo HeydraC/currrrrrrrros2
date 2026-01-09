@@ -30,11 +30,26 @@ map_all([V|Rest], AllCoords) :-
 
 initialBoard(VList) :- map_all(VList, AllCoords), check(AllCoords).
 
+moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
+    select(v(ID, v, Row, Col, Len), ListaOriginal, RestoDeVehiculos),
+    
+    NewRow is Row + Steps,
+    
+    NuevoVehiculo = v(ID, h, NewRow, Col, Len),
+    ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
+
+moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
+    select(v(ID, h, Row, Col, Len), ListaOriginal, RestoDeVehiculos),
+    
+    NewCol is Col + Steps,
+    
+    NuevoVehiculo = v(ID, h, Row, NewCol, Len),
+    ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
 
 :-initialization(main).
 
 main :-
-    moveVehicle([v(0,h,2,0,2)], 0, 1, NewState),
-
-    write(NewState),
-    halt.
+  moveVehicle([v(0,v,2,0,2)], 0, 3, NewState),
+  
+  write(NewState),
+  halt.
