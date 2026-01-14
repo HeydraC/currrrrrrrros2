@@ -35,7 +35,7 @@ moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
     
     NewRow is Row + Steps,
     
-    NuevoVehiculo = v(ID, h, NewRow, Col, Len),
+    NuevoVehiculo = v(ID, v, NewRow, Col, Len),
     ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
 
 moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
