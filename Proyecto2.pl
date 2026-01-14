@@ -46,10 +46,23 @@ moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
     NuevoVehiculo = v(ID, h, Row, NewCol, Len),
     ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
 
+isValidMove(ListaActual, _, 0) :- !.
+
+isValidMove(ListaActual, ID, Steps) :-
+    Steps \= 0,
+    
+    (Steps > 0 -> Unit = 1 ; Unit = -1),
+    
+    moveVehicle(ListaActual, ID, Unit, ListaIntermedia),
+
+    initialBoard(ListaIntermedia),
+    
+    NewSteps is Steps - Unit,
+    isValidMove(ListaIntermedia, ID, NewSteps).
+
 :-initialization(main).
 
 main :-
-  moveVehicle([v(0,v,2,0,2)], 0, 3, NewState),
+  (isValidMove([v(0,h,2,0,2),v(1,v,2,3,3)],0,2) -> write('Si'); write('No')),
   
-  write(NewState),
   halt.
