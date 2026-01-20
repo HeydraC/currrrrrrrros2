@@ -23,8 +23,8 @@ check(AllCoords) :-
   length(SortedCoords, LenSorted),
   LenOriginal =:= LenSorted.
 
-map_all([],[]).
-map_all([V|Remainder], AllCoords) :-
+mapAll([],[]).
+mapAll([V|Remainder], AllCoords) :-
   pos(V, VCoords),
   map_all(Remainder, RemCoords),
   append(VCoords, RemCoords, AllCoords).
