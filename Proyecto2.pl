@@ -26,10 +26,10 @@ check(AllCoords) :-
 mapAll([],[]).
 mapAll([V|Remainder], AllCoords) :-
   pos(V, VCoords),
-  map_all(Remainder, RemCoords),
+  mapAll(Remainder, RemCoords),
   append(VCoords, RemCoords, AllCoords).
 
-initialBoard(VehicleList) :- map_all(VehicleList, AllCoords), check(AllCoords).
+initialBoard(VehicleList) :- mapAll(VehicleList, AllCoords), check(AllCoords).
 
 moveVehicle(CurrentState, ID, Steps, NewState) :-
     select(v(ID, v, Row, Col, Len), CurrentState, Remainder),
