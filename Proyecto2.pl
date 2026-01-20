@@ -29,7 +29,16 @@ mapAll([V|Remainder], AllCoords) :-
   mapAll(Remainder, RemCoords),
   append(VCoords, RemCoords, AllCoords).
 
-initialBoard(VehicleList) :- mapAll(VehicleList, AllCoords), check(AllCoords).
+loadVehicles([]).
+loadVehicles([v(Id, Dir, Row, Col, Len) | Resto]) :-
+    assertz(vehiculo(Id, Dir, Row, Col, Len)), 
+    loadVehicles(Resto).
+
+initialBoard(VehicleList) :- 
+  retractall(vehiculo(_,_,_,_,_)),
+  mapAll(VehicleList, AllCoords),
+  check(AllCoords),
+  loadVehicles(VehicleList).
 
 moveVehicle(CurrentState, ID, Steps, NewState) :-
     select(v(ID, v, Row, Col, Len), CurrentState, Remainder),
