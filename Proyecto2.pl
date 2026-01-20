@@ -1,21 +1,21 @@
-dentro_tablero(Fila, Columna) :-
+inBoard(Fila, Columna) :-
   Fila >= 0, Fila < 6,
   Columna >= 0, Columna < 6.
 
-pos(v(_,_,_,_,0), []) :- !. % Caso base: longitud 0 no ocupa nada.
-pos(v(Id, h, Row, Col, Length), [coord(Row, Col) | Resto]) :-
+pos(v(_,_,_,_,0), []) :- !.
+pos(v(Id, h, Row, Col, Length), [coord(Row, Col) | Remainder]) :-
     Length > 0,
-    dentro_tablero(Row, Col),
+    inBoard(Row, Col),
     NextCol is Col + 1,
     NextLen is Length - 1,
-    pos(v(Id, h, Row, NextCol, NextLen), Resto).
+    pos(v(Id, h, Row, NextCol, NextLen), Remainder).
 
-pos(v(Id, v, Row, Col, Length), [coord(Row, Col) | Resto]) :-
+pos(v(Id, v, Row, Col, Length), [coord(Row, Col) | Remainder]) :-
     Length > 0,
-    dentro_tablero(Row, Col),
+    inBoard(Row, Col),
     NextRow is Row + 1,
     NextLen is Length - 1,
-    pos(v(Id, v, NextRow, Col, NextLen), Resto).
+    pos(v(Id, v, NextRow, Col, NextLen), Remainder).
 
 check(AllCoords) :-
   sort(AllCoords, SortedCoords),
@@ -24,49 +24,41 @@ check(AllCoords) :-
   LenOriginal =:= LenSorted.
 
 map_all([],[]).
-map_all([V|Rest], AllCoords) :-
+map_all([V|Remainder], AllCoords) :-
   pos(V, VCoords),
-  map_all(Rest, RestCoords),
-  append(VCoords, RestCoords, AllCoords).
+  map_all(Remainder, RemCoords),
+  append(VCoords, RemCoords, AllCoords).
 
-initialBoard(VList) :- map_all(VList, AllCoords), check(AllCoords).
+initialBoard(VehicleList) :- map_all(VehicleList, AllCoords), check(AllCoords).
 
-moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
-    select(v(ID, v, Row, Col, Len), ListaOriginal, RestoDeVehiculos),
-    
+moveVehicle(CurrentState, ID, Steps, NewState) :-
+    select(v(ID, v, Row, Col, Len), CurrentState, Remainder),
     NewRow is Row + Steps,
-    
-    NuevoVehiculo = v(ID, v, NewRow, Col, Len),
-    ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
+    NewVehicle = v(ID, v, NewRow, Col, Len),
+    NewState = [NewVehicle | Remainder].
 
-moveVehicle(ListaOriginal, ID, Steps, ListaNueva) :-
-    select(v(ID, h, Row, Col, Len), ListaOriginal, RestoDeVehiculos),
-    
+moveVehicle(CurrentSate, ID, Steps, NewState) :-
+    select(v(ID, h, Row, Col, Len), CurrentSate, Remainder),
     NewCol is Col + Steps,
-    
-    NuevoVehiculo = v(ID, h, Row, NewCol, Len),
-    ListaNueva = [NuevoVehiculo | RestoDeVehiculos].
+    NewVehicle = v(ID, h, Row, NewCol, Len),
+    NewState = [NewVehicle | Remainder].
 
 isValidMove(_, _, 0) :- !.
-
-isValidMove(ListaActual, ID, Steps) :-
+isValidMove(VehicleList, ID, Steps) :-
     Steps \= 0,
     (Steps > 0 -> Unit = 1 ; Unit = -1),
-    
-    moveVehicle(ListaActual, ID, Unit, ListaIntermedia),
-    
-    initialBoard(ListaIntermedia), 
-    
+    moveVehicle(VehicleList, ID, Unit, Intermediary),
+    initialBoard(Intermediary), 
     NewSteps is Steps - Unit,
-    isValidMove(ListaIntermedia, ID, NewSteps).
+    isValidMove(Intermediary, ID, NewSteps).
 
 solveRushHour(StartBoard, Solution) :-
     sort(StartBoard, StartSorted),
     bfs([[StartSorted, []]], [StartSorted], SolutionReverse),
     reverse(SolutionReverse, Solution).
 
-bfs([[Estado, Ruta] | _], _, Ruta) :-
-    meta(Estado).
+bfs([[State, Route] | _], _, Route) :-
+    meta(State).
 
 bfs([[EstadoActual, RutaActual] | RestoCola], Visitados, SolucionFinal) :-
     findall(
