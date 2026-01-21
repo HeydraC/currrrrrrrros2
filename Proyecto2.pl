@@ -52,22 +52,31 @@ moveVehicle(CurrentSate, ID, Steps, NewState) :-
     NewVehicle = v(ID, h, Row, NewCol, Len),
     NewState = [NewVehicle | Remainder].
 
-isValidMove(_, _, 0) :- !.
-isValidMove(VehicleList, ID, Steps) :-
+validate(_, _, 0) :- !.
+validate(VehicleList, ID, Steps) :-
     Steps \= 0,
     (Steps > 0 -> Unit = 1 ; Unit = -1),
     moveVehicle(VehicleList, ID, Unit, Intermediary),
     initialBoard(Intermediary), 
     NewSteps is Steps - Unit,
-    isValidMove(Intermediary, ID, NewSteps).
+    validate(Intermediary, ID, NewSteps).
+
+isValidMove(ID, Steps) :-
+    findall(v(Id, Dir, Row, Col, Len), vehiculo(Id, Dir, Row, Col, Len), VehicleList),
+    Steps \= 0,
+    (Steps > 0 -> Unit = 1 ; Unit = -1),
+    moveVehicle(VehicleList, ID, Unit, Intermediary),
+    initialBoard(Intermediary), 
+    NewSteps is Steps - Unit,
+    validate(Intermediary, ID, NewSteps).
 
 solveRushHour(StartBoard, Solution) :-
+    initialBoard(StartBoard),
     sort(StartBoard, StartSorted),
     bfs([[StartSorted, []]], [StartSorted], SolutionReverse),
     reverse(SolutionReverse, Solution).
 
-bfs([[State, Route] | _], _, Route) :-
-    meta(State).
+bfs([[State, Route] | _], _, Route) :-meta(State).
 
 bfs([[EstadoActual, RutaActual] | RestoCola], Visitados, SolucionFinal) :-
     findall(
@@ -99,7 +108,9 @@ generar_movimiento(Tablero, Id, Pasos, NuevoTablero) :-
     
     member(Pasos, [1, -1, 2, -2, 3, -3, 4, -4]),
     
-    isValidMove(Tablero, Id, Pasos),
+    retractall(vehiculo(_,_,_,_,_)),
+    loadVehicles(Tablero),
+    isValidMove(Id, Pasos),
     
     moveVehicle(Tablero, Id, Pasos, NuevoTablero).
 
