@@ -76,44 +76,40 @@ solveRushHour(StartBoard, Solution) :-
     bfs([[StartSorted, []]], [StartSorted], SolutionReverse),
     reverse(SolutionReverse, Solution).
 
-bfs([[State, Route] | _], _, Route) :-meta(State).
-
-bfs([[EstadoActual, RutaActual] | RestoCola], Visitados, SolucionFinal) :-
+bfs([[State, Route] | _], _, Route) :- goal(State).
+bfs([[State, Route] | Queue], Visited, Solution) :-
     findall(
-        [EstadoCanonico, [(Id, Pasos) | RutaActual]],
+        [RootState, [(Id, Steps) | Route]],
         (
-            generar_movimiento(EstadoActual, Id, Pasos, NuevoEstado),
-            
-            sort(NuevoEstado, EstadoCanonico),
-            
-            \+ member(EstadoCanonico, Visitados)
+            genMove(State, Id, Steps, NewState),
+            sort(NewState, RootState),
+            \+ member(RootState, Visited)
         ),
-        Hijos
+      Children
     ),
     
-    extraer_estados(Hijos, NuevosEstados),
-    append(Visitados, NuevosEstados, NuevosVisitados),
+    extractStates(Children, NewStates),
+    append(Visited, NewStates, NewVisited),
+  
+    append(Queue, Children, NewQueue),
     
-    append(RestoCola, Hijos, NuevaCola),
-    
-    bfs(NuevaCola, NuevosVisitados, SolucionFinal).
+    bfs(NewQueue, NewVisited, Solution).    
 
-meta(Tablero) :-
-    member(v(0, h, _, Col, Len), Tablero),
-    PosicionFinal is Col + Len - 1,
-    PosicionFinal =:= 5.
+goal(State) :-
+    member(v(0, h, _, Col, Len), State),
+    Position is Col + Len - 1,
+    Position =:= 5.
 
-generar_movimiento(Tablero, Id, Pasos, NuevoTablero) :-
-    member(v(Id, _, _, _, _), Tablero),
-    
-    member(Pasos, [1, -1, 2, -2, 3, -3, 4, -4]),
+genMove(State, Id, Steps, NewState) :-
+    member(v(Id, _, _, _, _), State),
+    member(Steps, [1, -1, 2, -2, 3, -3, 4, -4]),
     
     retractall(vehiculo(_,_,_,_,_)),
-    loadVehicles(Tablero),
-    isValidMove(Id, Pasos),
+    loadVehicles(State),
+    isValidMove(Id, Steps),
     
-    moveVehicle(Tablero, Id, Pasos, NuevoTablero).
+    moveVehicle(State, Id, Steps, NewState).
 
-extraer_estados([], []).
-extraer_estados([[E, _]|T], [E|R]) :-
-    extraer_estados(T, R).
+extractStates([], []).
+extractStates([[E, _]|T], [E|R]) :-
+    extractStates(T, R).
