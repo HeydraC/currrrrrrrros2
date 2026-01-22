@@ -56,7 +56,8 @@ validate(VehicleList, ID, Steps) :-
     Steps \= 0,
     (Steps > 0 -> Unit = 1 ; Unit = -1),
     moveVehicle(VehicleList, ID, Unit, Intermediary),
-    initialBoard(Intermediary), 
+    mapAll(Intermediary, AllCoords),
+    check(AllCoords),
     NewSteps is Steps - Unit,
     validate(Intermediary, ID, NewSteps).
 
@@ -65,7 +66,8 @@ isValidMove(ID, Steps) :-
     Steps \= 0,
     (Steps > 0 -> Unit = 1 ; Unit = -1),
     moveVehicle(VehicleList, ID, Unit, Intermediary),
-    initialBoard(Intermediary), 
+    mapAll(Intermediary, AllCoords),
+    check(AllCoords),
     NewSteps is Steps - Unit,
     validate(Intermediary, ID, NewSteps).
 
