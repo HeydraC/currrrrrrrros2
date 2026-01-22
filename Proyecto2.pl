@@ -35,7 +35,6 @@ loadVehicles([v(Id, Dir, Row, Col, Len) | Resto]) :-
     loadVehicles(Resto).
 
 initialBoard(VehicleList) :- 
-  retractall(vehiculo(_,_,_,_,_)),
   mapAll(VehicleList, AllCoords),
   check(AllCoords),
   loadVehicles(VehicleList).
