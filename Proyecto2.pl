@@ -1,6 +1,6 @@
-inBoard(Fila, Columna) :-
-  Fila >= 0, Fila < 6,
-  Columna >= 0, Columna < 6.
+inBoard(Row, Col) :-
+  Row >= 0, Row < 6,
+  Col >= 0, Col < 6.
 
 pos(v(_,_,_,_,0), []) :- !.
 pos(v(Id, h, Row, Col, Length), [coord(Row, Col) | Remainder]) :-
